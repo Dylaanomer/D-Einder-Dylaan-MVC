@@ -1,4 +1,5 @@
 ﻿using D_Einder_Dylaan_MVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -27,8 +28,9 @@ namespace D_Einder_Dylaan_MVC.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Register()
+        public async Task<IActionResult> Register(string returnurl=null)
         {
+            ViewData["ReturnUrl"] = returnurl;
             RegisterViewModel registerViewModel = new RegisterViewModel();
             return View(registerViewModel);
         }
@@ -36,8 +38,10 @@ namespace D_Einder_Dylaan_MVC.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
             
-         public async Task<IActionResult> Register(RegisterViewModel model)
+         public async Task<IActionResult> Register(RegisterViewModel model, string returnurl = null)
         {
+            ViewData["ReturnUrl"] = returnurl;
+            returnurl = returnurl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
                 var user = new User { UserName = model.Email, Email = model.Email, Name = model.Name };
@@ -45,18 +49,59 @@ namespace D_Einder_Dylaan_MVC.Controllers
                 if(result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return RedirectToAction("Index", "Home");
+                    return LocalRedirect(returnurl);
                 }
                 AddErrors(result);
 
             }
 
             return View(model);
-
-
-            RegisterViewModel registerViewModel = new RegisterViewModel();
-            return View(registerViewModel);
+          
         }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Login(string returnurl = null)
+        {
+            ViewData["ReturnUrl"] = returnurl;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model, string returnurl=null)
+        {
+            ViewData["ReturnUrl"] = returnurl;
+            returnurl = returnurl ?? Url.Content("~/");
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                if (result.Succeeded)
+                {
+                    return LocalRedirect(returnurl);
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid Login Attempt.");
+                    return View(model);
+                }
+            }
+
+
+            return View(model);
+        }
+
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogOff()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
 
         private void AddErrors (IdentityResult result)
         {
@@ -65,5 +110,9 @@ namespace D_Einder_Dylaan_MVC.Controllers
                 ModelState.AddModelError(string.Empty, error.Description);
             }
         }
+
+
+
+
     }
 }
