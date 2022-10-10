@@ -90,6 +90,19 @@ namespace D_Einder_Dylaan_MVC.Controllers
 
             }
 
+            List<SelectListItem> listItems = new List<SelectListItem>();
+            listItems.Add(new SelectListItem()
+            {
+                Value = "Personeel",
+                Text = "Personeel"
+            });
+            listItems.Add(new SelectListItem()
+            {
+                Value = "Manager",
+                Text = "Manager"
+            });
+            model.RoleList = listItems;
+
             return View(model);
           
         }
