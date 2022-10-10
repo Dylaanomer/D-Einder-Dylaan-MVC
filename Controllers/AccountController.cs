@@ -39,6 +39,7 @@ namespace D_Einder_Dylaan_MVC.Controllers
             {
                 await _roleManager.CreateAsync(new IdentityRole("Personeel"));
                 await _roleManager.CreateAsync(new IdentityRole("Manager"));
+                await _roleManager.CreateAsync(new IdentityRole("SUPERADMIN"));
             }
 
             List<SelectListItem> listItems = new List<SelectListItem>();
@@ -51,6 +52,11 @@ namespace D_Einder_Dylaan_MVC.Controllers
             {
                 Value = "Manager",
                 Text = "Manager"
+            });
+            listItems.Add(new SelectListItem()
+            {
+                Value = "SUPERADMIN",
+                Text = "SUPERADMIN"
             });
 
 
@@ -79,9 +85,13 @@ namespace D_Einder_Dylaan_MVC.Controllers
                     {
                         await _userManager.AddToRoleAsync(user,"Personeel");
                     }
-                    else
+                    else if(model.RoleSelected != null && model.RoleSelected.Length > 0 && model.RoleSelected == "Manager")
                     {
                         await _userManager.AddToRoleAsync(user, "Manager");
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "SUPERADMIN");
                     }
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnurl);
@@ -100,6 +110,11 @@ namespace D_Einder_Dylaan_MVC.Controllers
             {
                 Value = "Manager",
                 Text = "Manager"
+            });
+            listItems.Add(new SelectListItem()
+            {
+                Value = "SUPERADMIN",
+                Text = "SUPERADMIN"
             });
             model.RoleList = listItems;
 

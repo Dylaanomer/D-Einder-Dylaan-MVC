@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace D_Einder_Dylaan_MVC.Controllers
 {
 
-    [Authorize(Roles = "Manager")]
+    [Authorize(Roles = "SUPERADMIN")]
     public class GebruikerController : Controller
     {
 
