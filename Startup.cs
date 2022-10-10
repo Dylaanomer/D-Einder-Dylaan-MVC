@@ -34,6 +34,10 @@ namespace D_Einder_Dylaan_MVC
                )
            );
            services.AddIdentity<IdentityUser,IdentityRole>().AddEntityFrameworkStores<DataDbContext>();
+            services.ConfigureApplicationCookie(opt =>
+            {
+                opt.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Home/AccessDenied");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
