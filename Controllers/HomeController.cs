@@ -24,7 +24,7 @@ namespace D_Einder_Dylaan_MVC.Controllers
             return View();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Manager")]
         public IActionResult Privacy()
         {
             return View();

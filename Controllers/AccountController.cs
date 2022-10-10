@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace D_Einder_Dylaan_MVC.Controllers
@@ -39,9 +41,24 @@ namespace D_Einder_Dylaan_MVC.Controllers
                 await _roleManager.CreateAsync(new IdentityRole("Manager"));
             }
 
+            List<SelectListItem> listItems = new List<SelectListItem>();
+            listItems.Add(new SelectListItem()
+            {
+                Value = "Personeel",
+                Text = "Personeel"
+            });
+            listItems.Add(new SelectListItem()
+            {
+                Value = "Manager",
+                Text = "Manager"
+            });
+
 
             ViewData["ReturnUrl"] = returnurl;
-            RegisterViewModel registerViewModel = new RegisterViewModel();
+            RegisterViewModel registerViewModel = new RegisterViewModel()
+            {
+                RoleList = listItems
+            };
             return View(registerViewModel);
         }
 
@@ -58,6 +75,14 @@ namespace D_Einder_Dylaan_MVC.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if(result.Succeeded)
                 {
+                    if(model.RoleSelected!=null && model.RoleSelected.Length>0 && model.RoleSelected == "Personeel")
+                    {
+                        await _userManager.AddToRoleAsync(user,"Personeel");
+                    }
+                    else
+                    {
+                        await _userManager.AddToRoleAsync(user, "Manager");
+                    }
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnurl);
                 }
